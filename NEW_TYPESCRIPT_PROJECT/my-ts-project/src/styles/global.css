@@ -1,0 +1,89 @@
+body {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  background: #f5f3ee;
+  color: #111;
+}
+
+.hero {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.subtitle {
+  font-family: cursive;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.turntable {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  margin-top: 70px;
+}
+
+.record {
+  width: 500px;
+  height: 500px;
+  background: #111;
+  border-radius: 50%;
+  position: absolute; /* VERY IMPORTANT */
+}
+
+.spinning {
+  animation: spin 22s linear infinite;
+}
+
+.center-hole {
+  width: 120px;
+  height: 120px;
+  background: #869181;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.record-label-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* The record is 500px, so radius is 250px */
+  width: 250px; 
+  /* This ensures it rotates around the center of the record */
+  transform-origin: left center; 
+  
+  /* Flexbox pushes the button to the very end of the 250px width */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  
+  /* Remove the old pointer-events if you want clicking to be easier */
+  pointer-events: none; 
+}
+
+.record-label {
+  display: block;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font: times;
+  font-size: 1.2rem;
+  pointer-events: auto; /* Re-enable pointer for the button only */
+  padding-right: 10px; /* Optional: adds a tiny gap so it doesn't clip */
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
