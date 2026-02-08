@@ -10,6 +10,7 @@ export class StockAnimator {
     private dataArray!: Uint8Array<ArrayBuffer>;
     private lastIntensity: number = 0;
     private animationId: number | null = null;
+    private delaySeconds: number = 0;
 
 
     private readonly width = 800;
@@ -38,9 +39,10 @@ export class StockAnimator {
 
 
     // Call this to initialize data and audio
-    public async start(prices: number[], audioSource: HTMLAudioElement) {
+    public async start(prices: number[], audioSource: HTMLAudioElement, delaySeconds: number = 0) {
         this.prices = prices;
         this.audioElement = audioSource;
+        this.delaySeconds = delaySeconds;
         this.setupAudio(audioSource);
         this.animate();
     }
@@ -77,14 +79,19 @@ export class StockAnimator {
         // Sync with audio playback time
         if (this.audioElement && this.audioElement.duration) {
             const progress = (this.audioElement.currentTime / this.audioElement.duration) * (this.prices.length - 1);
-            this.frameProgress = Math.min(progress, this.prices.length - 1);
+            if (this.delaySeconds && this.delaySeconds > 0 && this.audioElement.duration > 0) {
+                const offset = (this.delaySeconds / this.audioElement.duration) * (this.prices.length - 1);
+                this.frameProgress = Math.min(Math.max(progress - offset, 0), this.prices.length - 1);
+            } else {
+                this.frameProgress = Math.min(progress, this.prices.length - 1);
+            }
         }
 
         this.draw(intensity);
 
         // Continue animation while audio is playing
         if (this.audioElement && !this.audioElement.paused && this.frameProgress < this.prices.length - 1) {
-            requestAnimationFrame(this.animate);
+            this.animationId = requestAnimationFrame(this.animate);
         }
     }
 
