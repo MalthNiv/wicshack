@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { StockAnimator } from '../pages/StockAnimator';
 import { stocks } from '../data/stocks';
-import stockData from '../data/stocks_daily_prices.json';
+import stockData from '../data/stocks_prices.json';
 
 type Props = {
   symbol: string;
@@ -25,17 +25,17 @@ export default function Graph({ symbol }: Props) {
   }, []);
 
   const handleStart = async () => {
-    const prices = (stockData.daily_prices as any)[symbol];
-    const audio = audioRef.current;
-
-    if (!prices || !audio) {
-      console.warn('Missing prices or audio element');
-      return;
-    }
-
     const stock = stocks.find(s => s.symbol === symbol);
     if (!stock) {
       console.warn(`No stock config found for ${symbol}`);
+      return;
+    }
+
+    const prices = (stockData.daily_prices as any)[stock.name];
+    const audio = audioRef.current;
+
+    if (!prices || !audio) {
+      console.warn('Missing prices or audio element for', stock.name);
       return;
     }
 
