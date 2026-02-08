@@ -3,6 +3,7 @@ export class StockAnimator {
     private ctx: CanvasRenderingContext2D;
     private prices: number[] = [];
     private frameProgress: number = 0;
+    private audioElement: HTMLAudioElement | null = null;
    
     private audioCtx: AudioContext | null = null;
     private analyser: AnalyserNode | null = null;
@@ -39,6 +40,7 @@ export class StockAnimator {
     // Call this to initialize data and audio
     public async start(prices: number[], audioSource: HTMLAudioElement) {
         this.prices = prices;
+        this.audioElement = audioSource;
         this.setupAudio(audioSource);
         this.animate();
     }
@@ -72,15 +74,16 @@ export class StockAnimator {
     private animate = () => {
         const intensity = this.getBeatIntensity();
        
-        // Speed sync: Base movement + audio surge
-        const speedBoost = (intensity / 255) * 0.25;
-        this.frameProgress += 0.03 + speedBoost;
-
+        // Sync with audio playback time
+        if (this.audioElement && this.audioElement.duration) {
+            const progress = (this.audioElement.currentTime / this.audioElement.duration) * (this.prices.length - 1);
+            this.frameProgress = Math.min(progress, this.prices.length - 1);
+        }
 
         this.draw(intensity);
 
-
-        if (this.frameProgress < this.prices.length - 1) {
+        // Continue animation while audio is playing
+        if (this.audioElement && !this.audioElement.paused && this.frameProgress < this.prices.length - 1) {
             requestAnimationFrame(this.animate);
         }
     }
