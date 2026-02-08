@@ -8,6 +8,9 @@ export default function RecordPlayer() {
 
   return (
     <div className="turntable">
+      <div className="sound-wave-ring" />
+      <div className="sound-wave-ring ring-2" />
+      <div className="sound-wave-ring ring-3" />
       <div className="record spinning">
         {stocks.map((stock, index) => {
           // Calculate the angle for each spoke
@@ -31,7 +34,9 @@ export default function RecordPlayer() {
           );
         })}
 
-        <div className="center-hole" />
+        <div className="center-hole">
+          <span className="center-text">choose <br /> your<br /> stock </span>
+        </div>
       </div>
     </div>
   );
