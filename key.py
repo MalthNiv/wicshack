@@ -1,15 +1,17 @@
 import yfinance as yf
 from textblob import TextBlob
 
-    
 def main():
-    all_tickers = ['TTD', 'BMBL', 'COF', 'DKNG', 'CVX', 'RBLX', 'COIN', 'JPM', 'SPOT', 'M']
-    all_scales = []
-    for i in range(len(all_tickers)):
-        all_scales.append(generate_song_key(all_tickers[i]))
-    print(all_scales)
-    
+    all_scales = get_all_song_keys()
+    for ticker, scale in all_scales.items():
+        print(f"{ticker}: {scale}")
 
+def get_all_song_keys():
+    all_tickers = ['TTD', 'BMBL', 'COF', 'DKNG', 'CVX', 'RBLX', 'COIN', 'JPM', 'SPOT', 'WMT']
+    all_scales = {}
+    for i in range(len(all_tickers)):
+        all_scales[all_tickers[i]] = generate_song_key(all_tickers[i])
+    return all_scales
 
 def generate_song_key(ticker): 
     # getting the data from yahoo finance
@@ -20,7 +22,6 @@ def generate_song_key(ticker):
         news.append(stock.news[i]['content'])
     # doing sentiment analysis
     if not news:
-        print("No news!")
         return
     for article in news:
         analysis = TextBlob(article['title'])

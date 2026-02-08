@@ -1,13 +1,15 @@
 import json
 import numpy as np
 from midiutil import MIDIFile
+import key
+import random
 
 # -----------------------------
 # 1) Pull stock data from JSON
 # -----------------------------
 DATA_PATH = "stocks_daily_prices.json"
-TICKER = "TTD"  # choose your stock (must be in the JSON)
-STOCK_NAME = "The Trade Desk"  # for file naming and rotation seeds
+TICKER = "WMT" # choose your stock (must be in the JSON)
+STOCK_NAME = "WMT" # for file naming and rotation seeds
 LAST_N = None  # or None for all
 
 with open(DATA_PATH, "r", encoding="utf-8") as f:
@@ -25,18 +27,46 @@ print("Loaded", len(prices), "prices for", TICKER)
 # -----------------------------
 # 2) Techno settings
 # -----------------------------
+def realized_volatility(prices, window=30):
+    prices = np.asarray(prices, dtype=float)
+    rets = np.diff(prices) / prices[:-1]          # daily % returns
+    rets = rets[-window:] if len(rets) > window else rets
+    return float(np.std(rets))                    # e.g. 0.02 = 2% daily vol
+
+def tempo_from_vol(vol, v_low=0.01, v_high=0.06, bpm_low=130, bpm_high=160):
+    # normalize vol into [0,1]
+    t = (vol - v_low) / (v_high - v_low)
+    t = max(0.0, min(1.0, t))  # clamp
+    bpm = bpm_low + t * (bpm_high - bpm_low)
+    return int(round(bpm))
+
 stock_steps_per_bar = 8   # 8 trading days per bar (volatility window)
 
 steps_per_bar = 16        # 16th-note grid
-bpm = 150
-step_beats = 0.25         # 16 * 0.25 = 4 beats
+vol = realized_volatility(prices, window=30)
+bpm = tempo_from_vol(vol)
 
+step_beats = 0.25         # 16 * 0.25 = 4 beats
 W = 40
-root_midi = 48            # C3
+
+# All scale offsets
+MAJOR_OFFSETS = [0, 2, 4, 5, 7, 9, 11]      # Ionian (major)
+MINOR_OFFSETS = [0, 2, 3, 5, 7, 8, 10]      # Aeolian (natural minor)
+
+NOTE_TO_SEMI = {
+    "C": 0,  "C#": 1, "D": 2,  "D#": 3, "E": 4,  "F": 5,
+    "F#": 6, "G": 7,  "G#": 8, "A": 9,  "A#": 10,"B": 11
+}
+
+all_scales = key.get_all_song_keys()
+scale_name = all_scales[TICKER].split()[0]  # e.g. "C#"
+scale_type = all_scales[TICKER].split()[1]  # "Major"
+
+base_c_midi = 48            # C3
 octaves = 3
 
-# C natural minor: C D Eb F G Ab Bb
-SCALE_OFFSETS = np.array([0, 2, 3, 5, 7, 8, 10], dtype=int)
+root_midi = base_c_midi + NOTE_TO_SEMI[scale_name]
+SCALE_OFFSETS = MAJOR_OFFSETS if scale_type == "Major" else MINOR_OFFSETS
 
 k_min, k_max = 4, 16          # allow full 16ths in extreme volatility
 density_gamma = 0.45          # ramps to dense faster
@@ -44,8 +74,8 @@ gate = 0.85                  # base gate (we’ll tighten more per-bar)
 lead_vmin, lead_vmax = 50, 120
 
 # Instruments (General MIDI)
-LEAD_PROGRAM = 87         # 84 = Lead 5 (charang) (edgy)
-BASS_PROGRAM = 39         # 38 = Synth Bass 1 (rounder)
+LEAD_PROGRAM = random.choice([30, 81, 82, 84, 85, 86, 87])       
+BASS_PROGRAM = random.choice([38, 39, 40, 41])
 
 # Drum kit channel
 DRUM_CH = 9
@@ -387,8 +417,9 @@ for b in range(num_stock_bars):
 
     t += bar_len
 
-out_path = f"{STOCK_NAME.replace(' ', '_')}_TECHNO.mid"
+out_path = f"{STOCK_NAME.replace(' ', '_')}.mid"
 with open(out_path, "wb") as f:
     midi.writeFile(f)
 
+print("scale:", scale_name, scale_type, "stock:", STOCK_NAME)
 print("Wrote:", out_path)
