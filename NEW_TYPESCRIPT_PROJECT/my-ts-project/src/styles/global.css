@@ -1,0 +1,363 @@
+body {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  background: #000;
+  color: #99bacd;
+}
+
+.hero {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.8rem;
+  text-shadow:
+    0 0 10px rgba(153, 186, 205, 0.8),
+    0 0 30px rgba(153, 186, 205, 0.4),
+    0 0 60px rgba(153, 186, 205, 0.2);
+}
+
+.hero h1 {
+  background: linear-gradient(90deg, #5BB8F5 0%, #266298 35%, #7B2D8E 65%, #C4447A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-family: cursive;
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, #5BB8F5 0%, #266298 35%, #7B2D8E 65%, #C4447A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 1;
+  filter: brightness(1.5);
+}
+
+.turntable {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  margin-top: 70px;
+}
+
+.record {
+  width: 650px;
+  height: 650px;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0px,
+      transparent 14px,
+      rgba(255, 255, 255, 0.06) 15px,
+      transparent 16px
+    ),
+    #111;
+  border-radius: 50%;
+  position: absolute; /* VERY IMPORTANT */
+  box-shadow:
+    0 0 15px rgba(123, 45, 142, 0.6),
+    0 0 40px rgba(123, 45, 142, 0.3),
+    0 0 80px rgba(123, 45, 142, 0.15);
+}
+
+.spinning {
+  animation: spin 22s linear infinite;
+}
+
+.center-hole {
+  width: 150px;
+  height: 150px;
+  background: #7B2D8E;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 15px rgba(123, 45, 142, 0.8),
+    0 0 40px rgba(123, 45, 142, 0.5),
+    0 0 80px rgba(123, 45, 142, 0.3);
+  animation: pulse-glow 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-text {
+  font-family: "Electrolize", sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 1px;
+  line-height: 1.3;
+  animation: counter-spin 22s linear infinite;
+}
+
+@keyframes counter-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+.record-label-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* The record is 650px, so radius is 325px */
+  width: 325px; 
+  /* This ensures it rotates around the center of the record */
+  transform-origin: left center; 
+  
+  /* Flexbox pushes the button to the very end of the 250px width */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  
+  /* Remove the old pointer-events if you want clicking to be easier */
+  pointer-events: none; 
+}
+
+.record-label {
+  display: block;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-family: "Electrolize", sans-serif;
+  font-size: 1.5rem;
+  pointer-events: auto; /* Re-enable pointer for the button only */
+  padding-right: 10px; /* Optional: adds a tiny gap so it doesn't clip */
+  transition: text-shadow 0.3s, transform 0.3s;
+}
+
+.record-label:hover {
+  text-shadow:
+    0 0 10px rgba(153, 186, 205, 0.8),
+    0 0 30px rgba(153, 186, 205, 0.5),
+    0 0 60px rgba(153, 186, 205, 0.3);
+  transform: scale(1.15);
+}
+
+
+.floating-notes-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.floating-note {
+  position: absolute;
+  bottom: -30px;
+  animation: float-up linear infinite;
+  opacity: 0;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.cursor-glow {
+  position: fixed;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(123, 45, 142, 0.3) 0%,
+    rgba(123, 45, 142, 0.1) 40%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sound-wave-ring {
+  position: absolute;
+  width: 650px;
+  height: 650px;
+  border-radius: 50%;
+  border: 2px solid rgba(123, 45, 142, 0.6);
+  animation: ripple 4s ease-out infinite;
+  pointer-events: none;
+}
+
+.ring-2 {
+  animation-delay: 1.3s;
+}
+
+.ring-3 {
+  animation-delay: 2.6s;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(123, 45, 142, 0.8),
+      0 0 40px rgba(123, 45, 142, 0.5),
+      0 0 80px rgba(123, 45, 142, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(123, 45, 142, 1),
+      0 0 60px rgba(123, 45, 142, 0.7),
+      0 0 120px rgba(123, 45, 142, 0.4);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.stock-page {
+ min-height: 100vh;
+ padding: 1rem 2rem;
+ background: radial-gradient(circle at top, #0f0f0f 0%, #111111 100%);
+ color: #f0f0f0;
+ font-family: "IBM Plex Mono", monospace;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 1rem;
+}
+
+
+.stock-page h2 {
+ font-size: 3rem;
+ margin: 0;
+ background: linear-gradient(90deg, #5BB8F5 0%, #266298 35%, #7B2D8E 65%, #C4447A 100%);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ filter: brightness(1.3);
+}
+
+
+.back-record {
+ align-self: flex-start;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ gap: 0.75rem;
+ transition: transform 0.3s, filter 0.3s;
+}
+
+.back-record:hover {
+ transform: scale(1.2);
+ filter: drop-shadow(0 0 12px #7B2D8E);
+}
+
+.mini-record {
+ width: 95px;
+ height: 95px;
+ border-radius: 50%;
+ background:
+   repeating-radial-gradient(
+     circle at 50% 50%,
+     transparent 0px,
+     transparent 4px,
+     rgba(196, 68, 122, 0.2) 5px,
+     transparent 6px
+   ),
+   #111;
+ box-shadow: 0 0 10px rgba(196, 68, 122, 0.5), 0 0 25px rgba(123, 45, 142, 0.3);
+ position: relative;
+ animation: spin 8s linear infinite;
+}
+
+.mini-record-text {
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ fill: #C4447A;
+ font-size: 9px;
+ font-family: "Electrolize", sans-serif;
+ letter-spacing: 5.5px;
+ text-transform: uppercase;
+}
+
+.mini-hole {
+ width: 18px;
+ height: 18px;
+ background: #C4447A;
+ border-radius: 50%;
+ position: absolute;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ box-shadow: 0 0 8px rgba(196, 68, 122, 0.9);
+}
+
+
+
+
+.graph-container {
+ width: 95%;
+ max-width: 1200px;
+ border: 2px solid transparent;
+ border-radius: 12px;
+ padding: 1rem;
+ background:
+   linear-gradient(#111, #111) padding-box,
+   linear-gradient(90deg, #5BB8F5 0%, #266298 35%, #7B2D8E 65%, #C4447A 100%) border-box;
+ box-shadow: 0 0 10px rgba(123, 45, 142, 0.5);
+ transition: transform 0.2s ease;
+}
+
+
+
+
+.graph-container canvas {
+ width: 100% !important;
+ height: 500px !important;
+}
+
+
+.graph-container {
+ animation: pulse 2s infinite ease-in-out alternate;
+}
+
+
+@keyframes pulse {
+ 0%, 100% { filter: drop-shadow(0 0 5px rgba(123, 45, 142, 0.5)); }
+ 50% { filter: drop-shadow(0 0 10px rgba(123, 45, 142, 0.5)); }
+}
+
