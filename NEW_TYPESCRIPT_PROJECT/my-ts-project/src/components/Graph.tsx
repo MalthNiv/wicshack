@@ -13,7 +13,7 @@ export default function Graph({ symbol }: Props) {
   const animatorRef = useRef<StockAnimator | null>(null);
 
   useEffect(() => {
-    // Initialize your animator when the component loads
+    // Initialize the animator when the component loads
     if (canvasRef.current && !animatorRef.current) {
       animatorRef.current = new StockAnimator(canvasRef.current);
     }
@@ -58,9 +58,7 @@ export default function Graph({ symbol }: Props) {
     <div className="graph" style={{ textAlign: 'center' }}>
       <p>{symbol} price movement</p>
       
-      {/* Replaced her <svg> with your <canvas>. 
-        The style matches her original dimensions. 
-      */}
+      {}
       <canvas 
         ref={canvasRef} 
         style={{ width: '100%', maxWidth: '800px', height: 'auto', background: '#161a1e', borderRadius: '8px' }} 
