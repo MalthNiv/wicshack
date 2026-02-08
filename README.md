@@ -1,4 +1,4 @@
-# NOW YOU HEAR ME
+# NOW YOU \*HEAR\* ME
 
 A web app that turns stock price data into music and visualizes it. You can choose a stock from a spinning record, and its price history will draw itself on screen — synced to a generated audio track, created by analyzing the performance and volatility of the stock.
 
