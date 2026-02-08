@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { StockAnimator } from '../pages/StockAnimator'; // Ensure this path is correct
-import stockData from '/Users/sophiali/wicshack/NEW_TYPESCRIPT_PROJECT/my-ts-project/stocks_daily_prices.json';
+import { StockAnimator } from '../pages/StockAnimator';
+import { stocks } from '../data/stocks';
+import stockData from '../data/stocks_daily_prices.json';
 
 type Props = {
   symbol: string;
@@ -23,17 +24,35 @@ export default function Graph({ symbol }: Props) {
     };
   }, []);
 
-  const handleStart = () => {
-    // Find the specific stock data using the symbol passed from StockPage.tsx
+  const handleStart = async () => {
     const prices = (stockData.daily_prices as any)[symbol];
+    const audio = audioRef.current;
 
-    if (prices && audioRef.current) {
-      audioRef.current.play();
-      animatorRef.current?.start(prices, audioRef.current);
-    } else {
-      console.warn(`No price data found for ${symbol} or audio missing.`);
+    if (!prices || !audio) {
+      console.warn('Missing prices or audio element');
+      return;
     }
+
+    const stock = stocks.find(s => s.symbol === symbol);
+    if (!stock) {
+      console.warn(`No stock config found for ${symbol}`);
+      return;
+    }
+
+    // Set the audio source dynamically
+    audio.src = stock.audio;
+    audio.currentTime = 0;
+
+    try {
+      await audio.play();
+    } catch (err) {
+      console.error('Audio play failed:', err);
+      return;
+    }
+
+    animatorRef.current?.start(prices, audio);
   };
+
 
   return (
     <div className="graph" style={{ textAlign: 'center' }}>
@@ -47,7 +66,11 @@ export default function Graph({ symbol }: Props) {
         style={{ width: '100%', maxWidth: '800px', height: 'auto', background: '#161a1e', borderRadius: '8px' }} 
       />
 
-      <audio ref={audioRef} src="/music/track.mp3" />
+      <audio
+        ref={audioRef}
+        crossOrigin="anonymous"
+      />
+
 
       <div style={{ marginTop: '20px' }}>
         <button 
