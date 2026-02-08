@@ -11,6 +11,7 @@ export class StockAnimator {
     private lastIntensity: number = 0;
     private animationId: number | null = null;
     private delaySeconds: number = 0;
+    private audioSetup: boolean = false;
 
 
     private readonly width = 800;
@@ -40,15 +41,20 @@ export class StockAnimator {
 
     // Call this to initialize data and audio
     public async start(prices: number[], audioSource: HTMLAudioElement, delaySeconds: number = 0) {
+        if (this.animationId) cancelAnimationFrame(this.animationId);
         this.prices = prices;
         this.audioElement = audioSource;
         this.delaySeconds = delaySeconds;
+        this.frameProgress = 0;
+        this.lastIntensity = 0;
         this.setupAudio(audioSource);
         this.animate();
     }
 
 
     private setupAudio(audio: HTMLAudioElement) {
+        if (this.audioSetup) return;
+
         this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         const source = this.audioCtx.createMediaElementSource(audio);
         this.analyser = this.audioCtx.createAnalyser();
@@ -60,6 +66,7 @@ export class StockAnimator {
 
 
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        this.audioSetup = true;
     }
 
 
@@ -96,8 +103,7 @@ export class StockAnimator {
     }
 
     public stop() {
-        if (this.animationId) cancelAnimationFrame(this.animationId); 
-        if (this.audioCtx) this.audioCtx.close(); 
+        if (this.animationId) cancelAnimationFrame(this.animationId);
     }
 
     private draw(intensity: number) {

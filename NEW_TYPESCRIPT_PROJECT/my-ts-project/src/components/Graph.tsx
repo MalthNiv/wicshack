@@ -50,7 +50,7 @@ export default function Graph({ symbol }: Props) {
       return;
     }
 
-    animatorRef.current?.start(prices, audio);
+    animatorRef.current?.start(prices, audio, 0.2);
   };
 
 
