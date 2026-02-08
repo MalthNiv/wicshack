@@ -51,6 +51,28 @@ export class StockAnimator {
         this.animate();
     }
 
+    // Fetch JSON from a URL (or relative path) and start with its price values.
+    // Expects an array of objects or numbers; if objects, tries to read `price`.
+    public async startFromJSON(url: string, audioSource: HTMLAudioElement, delaySeconds: number = 0) {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+            const data = await res.json();
+            let prices: number[] = [];
+            if (Array.isArray(data)) {
+                prices = data.map((item: any) => {
+                    if (typeof item === 'number') return item;
+                    if (item && (item.price !== undefined)) return Number(item.price);
+                    if (item && (item.close !== undefined)) return Number(item.close);
+                    return NaN;
+                }).filter((p: number) => !Number.isNaN(p));
+            }
+            await this.start(prices, audioSource, delaySeconds);
+        } catch (err) {
+            console.error('startFromJSON error:', err);
+        }
+    }
+
 
     private setupAudio(audio: HTMLAudioElement) {
         if (this.audioSetup) return;
@@ -128,8 +150,12 @@ export class StockAnimator {
         const lineWidth = 3 + (intensity / 255) * 4;
 
 
+        // Safety: need at least two points
+        if (prices.length < 2) return;
+
         // 1. Draw completed segments
-        for (let i = 1; i < frameProgress; i++) {
+        const completedUntil = Math.floor(frameProgress);
+        for (let i = 1; i < completedUntil; i++) {
             const x1 = getX(i - 1), y1 = getY(prices[i - 1]);
             const x2 = getX(i), y2 = getY(prices[i]);
 
